@@ -953,6 +953,54 @@ class ApiService {
     }
   }
 
+
+// Submit support request
+  Future<Map<String, dynamic>> submitSupport({
+    required String name,
+    required String email,
+    required String message,
+    String? userId,
+  }) async {
+    try {
+      print('Submitting support request from: $name ($email)');
+      
+      final response = await postWithoutAuth('/api/support', {
+        'name': name,
+        'email': email,
+        'message': message,
+        'userId': userId,
+      });
+
+      print('Support request response status: ${response.statusCode}');
+      print('Support request response body: ${response.body}');
+
+      if (response.statusCode == 201) {
+        final data = json.decode(response.body);
+        print('Support request submitted successfully');
+        return {
+          'success': true,
+          'message': 'Support request submitted successfully',
+          'data': data,
+        };
+      } else {
+        final error = json.decode(response.body);
+        print('Support request submission failed: ${error['message'] ?? 'Unknown error'}');
+        return {
+          'success': false,
+          'message': error['message'] ?? 'Failed to submit support request',
+          'error': error,
+        };
+      }
+    } catch (e) {
+      print('Exception in submitSupport: $e');
+      return {
+        'success': false,
+        'message': 'Failed to submit support request: $e',
+      };
+    }
+  }
+
+  
   // ===== NEW METHODS FOR DYNAMIC FEATURES =====
 
   // Get app name for splash screen
